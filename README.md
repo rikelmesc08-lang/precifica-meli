@@ -14,8 +14,10 @@ Stack: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · sh
 
 ## Deploy
 
-O site é estático (`output: "export"`) e fica no GitHub Pages (branch `gh-pages`).
-Para publicar uma nova versão: `npm run deploy` (roda os testes, gera o build e envia).
+O site é estático (`output: "export"`).
+
+- **Vercel (principal):** https://precifica-meli.vercel.app — publique com `npx vercel deploy --prod`.
+- **GitHub Pages:** https://rikelmesc08-lang.github.io/precifica-meli/ — publique com `npm run deploy`.
 
 ## Estrutura
 
