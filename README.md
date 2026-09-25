@@ -14,8 +14,8 @@ Stack: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · sh
 
 ## Deploy
 
-O site é estático (`output: "export"`) e publicado no GitHub Pages pelo workflow
-`.github/workflows/deploy.yml` a cada push na branch `main` (roda os testes antes do build).
+O site é estático (`output: "export"`) e fica no GitHub Pages (branch `gh-pages`).
+Para publicar uma nova versão: `npm run deploy` (roda os testes, gera o build e envia).
 
 ## Estrutura
 
