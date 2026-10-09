@@ -5,13 +5,32 @@ import { StoreProvider } from "@/components/providers/store-provider"
 import { AppShell } from "@/components/app/app-shell"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/config/site"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Precifica Meli · Análise de produtos para marketplaces",
-  description: "Calcule custo real, taxas, lucro, margem, ROI e preço ideal no Mercado Livre, Shopee e TikTok Shop.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Precifica Meli · Calculadora de lucro para Mercado Livre, Shopee e TikTok Shop",
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: ["calculadora Mercado Livre", "taxas Shopee", "TikTok Shop taxas", "margem de lucro", "preço de venda", "ROI", "marketplace"],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "/",
+    siteName: SITE_NAME,
+    title: "Precifica Meli · Calculadora de lucro para marketplaces",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: { card: "summary", title: "Precifica Meli · Calculadora de lucro para marketplaces", description: SITE_DESCRIPTION },
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
 }
 
 export const viewport: Viewport = {

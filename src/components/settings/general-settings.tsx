@@ -69,7 +69,7 @@ export function GeneralSettings() {
         icon={PercentIcon}
         title="Imposto (padrão para novas análises)"
         description="Tributos dependem do regime tributário e da operação da empresa. Configure de acordo com sua situação."
-        action={<Switch checked={settings.tax.enabled} onCheckedChange={(v) => set((s) => void (s.tax.enabled = v))} />}
+        action={<Switch aria-label="Ativar imposto nas novas análises" checked={settings.tax.enabled} onCheckedChange={(v) => set((s) => void (s.tax.enabled = v))} />}
       >
         <Field label="Alíquota sobre o preço de venda" className="sm:max-w-xs">
           <NumberField value={settings.tax.percent} onChange={(v) => set((s) => void (s.tax.percent = v ?? 0))} suffix="%" disabled={!settings.tax.enabled} />
@@ -81,7 +81,7 @@ export function GeneralSettings() {
         icon={MegaphoneIcon}
         title="Publicidade (padrão para novas análises)"
         description="Custo de anúncios por venda, descontado do lucro líquido."
-        action={<Switch checked={settings.ads.enabled} onCheckedChange={(v) => set((s) => void (s.ads.enabled = v))} />}
+        action={<Switch aria-label="Ativar publicidade nas novas análises" checked={settings.ads.enabled} onCheckedChange={(v) => set((s) => void (s.ads.enabled = v))} />}
       >
         <div className="flex flex-col gap-3 sm:max-w-md sm:flex-row">
           <Segmented

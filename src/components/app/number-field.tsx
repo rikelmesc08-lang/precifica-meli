@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { parseBRNumber } from "@/lib/format"
+import { useFieldContext } from "@/components/app/bits"
 
 interface NumberFieldProps {
   id?: string
@@ -30,6 +31,8 @@ function display(value: number | null, decimals: number): string {
  * Mantém o texto digitado enquanto em foco e formata ao sair.
  */
 export function NumberField({ id, value, onChange, prefix, suffix, decimals = 2, placeholder, min = 0, className, disabled, ...rest }: NumberFieldProps) {
+  const field = useFieldContext()
+  const inputId = id ?? field?.controlId
   const [focused, setFocused] = React.useState(false)
   const [text, setText] = React.useState(() => display(value, decimals))
 
@@ -49,8 +52,9 @@ export function NumberField({ id, value, onChange, prefix, suffix, decimals = 2,
     >
       {prefix && <span className="pl-3 text-xs text-muted-foreground select-none">{prefix}</span>}
       <input
-        id={id}
+        id={inputId}
         aria-label={rest["aria-label"]}
+        aria-describedby={field?.hintId}
         inputMode="decimal"
         autoComplete="off"
         disabled={disabled}
