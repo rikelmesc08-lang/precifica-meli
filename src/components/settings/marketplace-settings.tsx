@@ -36,7 +36,7 @@ function FeeRuleRow({ rule, onChange, onDelete }: { rule: FeeRule; onChange: (r:
         <Switch checked={rule.enabled} onCheckedChange={(v) => patch({ enabled: v })} className="mt-2" aria-label="Ativar regra" />
         <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Nome da cobrança" className="sm:col-span-2">
-            <Input className="h-9 bg-input/20" value={rule.label} onChange={(e) => patch({ label: e.target.value })} />
+            <Input aria-label="Nome da cobrança" className="h-9 bg-input/20" value={rule.label} onChange={(e) => patch({ label: e.target.value })} />
           </Field>
           <Field label="Aparece como">
             <AppSelect value={rule.group} onChange={(v) => patch({ group: v })} options={GROUPS} />
@@ -172,7 +172,7 @@ export function MarketplaceSettings({ id }: { id: MarketplaceId }) {
           action={
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               Ativa
-              <Switch checked={cc.enabled} onCheckedChange={(v) => update((c) => void (c.categoryCommission!.enabled = v))} />
+              <Switch aria-label="Ativar comissão por categoria" checked={cc.enabled} onCheckedChange={(v) => update((c) => void (c.categoryCommission!.enabled = v))} />
             </label>
           }
         >

@@ -40,7 +40,7 @@ function Brand() {
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
   return (
-    <nav className="flex flex-col gap-0.5">
+    <nav aria-label="Navegação principal" className="flex flex-col gap-0.5">
       {NAV.map(({ href, label, icon: Icon }) => {
         const active = href === "/" ? pathname === "/" : pathname.startsWith(href)
         return (
@@ -48,12 +48,13 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             key={href}
             href={href}
             onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
             className={cn(
               "group flex h-9 items-center gap-3 rounded-lg px-2.5 text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground",
               active && "bg-sidebar-accent font-medium text-sidebar-foreground",
             )}
           >
-            <Icon className={cn("size-4 text-sidebar-foreground/50 transition-colors group-hover:text-sidebar-foreground/80", active && "text-sidebar-foreground")} />
+            <Icon aria-hidden className={cn("size-4 text-sidebar-foreground/50 transition-colors group-hover:text-sidebar-foreground/80", active && "text-sidebar-foreground")} />
             {label}
           </Link>
         )
@@ -87,6 +88,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   return (
     <div className="flex min-h-dvh">
+      <a
+        href="#conteudo"
+        className="sr-only z-50 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >
+        Pular para o conteúdo
+      </a>
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar px-3 py-5 lg:flex">
         <Brand />
         <div className="mt-8 flex-1">
@@ -112,7 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
         </header>
-        <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-10">{children}</main>
+        <main id="conteudo" tabIndex={-1} className="outline-none mx-auto w-full max-w-[1400px] flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-10">{children}</main>
       </div>
     </div>
   )

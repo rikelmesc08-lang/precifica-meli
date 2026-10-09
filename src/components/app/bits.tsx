@@ -24,14 +24,43 @@ export function PageHeader({ title, description, actions, eyebrow }: { title: st
   )
 }
 
+/**
+ * Liga o rótulo do <Field> ao controle dentro dele (NumberField, AppSelect,
+ * Segmented) sem precisar passar `id` à mão: leitores de tela anunciam o rótulo
+ * e clicar no rótulo foca o campo.
+ */
+interface FieldContextValue {
+  /** id do controle principal (alvo do htmlFor do rótulo) */
+  controlId: string
+  /** id do próprio rótulo (para aria-labelledby) */
+  labelId: string
+  /** id da dica, quando existe (para aria-describedby) */
+  hintId?: string
+}
+
+const FieldContext = React.createContext<FieldContextValue | null>(null)
+
+export function useFieldContext() {
+  return React.useContext(FieldContext)
+}
+
 export function Field({ label, htmlFor, hint, children, className }: { label: string; htmlFor?: string; hint?: React.ReactNode; children: React.ReactNode; className?: string }) {
+  const autoId = React.useId()
+  const controlId = htmlFor ?? `field${autoId}`
+  const labelId = `${controlId}-label`
+  const hintId = hint ? `${controlId}-hint` : undefined
+  const ctx = React.useMemo(() => ({ controlId, labelId, hintId }), [controlId, labelId, hintId])
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label htmlFor={htmlFor} className="text-xs font-medium text-muted-foreground">
+      <Label id={labelId} htmlFor={controlId} className="text-xs font-medium text-muted-foreground">
         {label}
       </Label>
-      {children}
-      {hint && <p className="text-[11px] leading-relaxed text-muted-foreground/80">{hint}</p>}
+      <FieldContext.Provider value={ctx}>{children}</FieldContext.Provider>
+      {hint && (
+        <p id={hintId} className="text-[11px] leading-relaxed text-muted-foreground/80">
+          {hint}
+        </p>
+      )}
     </div>
   )
 }
@@ -100,7 +129,7 @@ export function Pct({ value, tone = false, className }: { value: number | null |
 export function Hint({ children }: { children: React.ReactNode }) {
   return (
     <Tooltip>
-      <TooltipTrigger render={<button type="button" className="inline-flex text-muted-foreground/70 transition-colors hover:text-foreground" aria-label="Ajuda" />}>
+      <TooltipTrigger render={<button type="button" className="inline-flex rounded-sm text-muted-foreground/70 transition-colors outline-none hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60" aria-label="Ajuda" />}>
         <InfoIcon className="size-3.5" />
       </TooltipTrigger>
       <TooltipContent className="max-w-72 text-xs leading-relaxed">{children}</TooltipContent>
@@ -121,18 +150,54 @@ export function EmptyState({ icon: Icon, title, description, action }: { icon: R
   )
 }
 
-export function Segmented<T extends string>({ value, onChange, options, className, size = "default" }: { value: T; onChange: (v: T) => void; options: { value: T; label: React.ReactNode }[]; className?: string; size?: "sm" | "default" }) {
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
+  className,
+  size = "default",
+  "aria-label": ariaLabel,
+}: {
+  value: T
+  onChange: (v: T) => void
+  options: { value: T; label: React.ReactNode }[]
+  className?: string
+  size?: "sm" | "default"
+  "aria-label"?: string
+}) {
+  const field = useFieldContext()
+  const refs = React.useRef<(HTMLButtonElement | null)[]>([])
+  // Padrão WAI-ARIA de radiogroup: só a opção marcada entra no Tab; setas trocam a opção.
+  const onKeyDown = (e: React.KeyboardEvent, index: number) => {
+    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0
+    if (!delta || !options.length) return
+    e.preventDefault()
+    const next = (index + delta + options.length) % options.length
+    onChange(options[next].value)
+    refs.current[next]?.focus()
+  }
+  const hasChecked = options.some((o) => o.value === value)
   return (
-    <div role="radiogroup" className={cn("inline-flex rounded-lg bg-muted p-0.5", className)}>
-      {options.map((o) => (
+    <div
+      role="radiogroup"
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabel ? undefined : field?.labelId}
+      className={cn("inline-flex rounded-lg bg-muted p-0.5", className)}
+    >
+      {options.map((o, i) => (
         <button
           key={o.value}
+          ref={(el) => {
+            refs.current[i] = el
+          }}
           type="button"
           role="radio"
           aria-checked={value === o.value}
+          tabIndex={value === o.value || (!hasChecked && i === 0) ? 0 : -1}
           onClick={() => onChange(o.value)}
+          onKeyDown={(e) => onKeyDown(e, i)}
           className={cn(
-            "flex-1 rounded-md px-3 font-medium whitespace-nowrap text-muted-foreground transition-all hover:text-foreground",
+            "flex-1 rounded-md px-3 font-medium whitespace-nowrap text-muted-foreground transition-all outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60",
             size === "sm" ? "h-7 text-xs" : "h-8 text-xs sm:text-sm",
             value === o.value && "bg-background text-foreground shadow-sm ring-1 ring-foreground/10",
           )}

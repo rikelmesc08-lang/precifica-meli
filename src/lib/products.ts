@@ -15,6 +15,22 @@ export function buildSnapshot(input: AnalysisInput, marketplace: MarketplaceId, 
   }
 }
 
+/**
+ * O snapshot salvo ficou desatualizado em relação às taxas/configurações atuais?
+ * Compara o resultado recalculado com o salvo (preço, custo, lucro, margem e ROI).
+ */
+export function isSnapshotStale(p: SavedProduct, settings: Settings): boolean {
+  const current = buildSnapshot(p.input, p.marketplace, settings)
+  const saved = p.snapshot
+  return (
+    current.salePrice !== saved.salePrice ||
+    current.unitCost !== saved.unitCost ||
+    current.profit !== saved.profit ||
+    current.margin !== saved.margin ||
+    current.roi !== saved.roi
+  )
+}
+
 export function createProduct(input: AnalysisInput, marketplace: MarketplaceId, settings: Settings): SavedProduct {
   const now = new Date().toISOString()
   return {

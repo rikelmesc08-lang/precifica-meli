@@ -52,11 +52,11 @@ function MarketplaceOptions({ id, input, settings, update }: { id: MarketplaceId
 
   return (
     <div className="rounded-lg border bg-background/30">
-      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between gap-2 px-3.5 py-3 text-left text-[13px] transition-colors hover:bg-muted/40">
+      <button type="button" aria-expanded={open} aria-controls={`fees-${id}`} onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between gap-2 px-3.5 py-3 text-left text-[13px] transition-colors hover:bg-muted/40">
         <MarketplaceName id={id} className="font-medium" />
         <span className="flex items-center gap-2 text-[11px] text-muted-foreground">
           {activeCount} regras ativas
-          <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
+          <ChevronDownIcon aria-hidden className={cn("size-3.5 transition-transform", open && "rotate-180")} />
         </span>
       </button>
 
@@ -83,7 +83,7 @@ function MarketplaceOptions({ id, input, settings, update }: { id: MarketplaceId
       )}
 
       {open && (
-        <div className="space-y-1 border-t px-3.5 py-3">
+        <div id={`fees-${id}`} className="space-y-1 border-t px-3.5 py-3">
           <p className="pb-1 text-[11px] text-muted-foreground">Ligue/desligue cobranças só nesta análise. Valores são editados em Configurações.</p>
           {config.fees.map((f) => (
             <label key={f.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-1.5 py-1.5 transition-colors hover:bg-muted/40">
@@ -94,7 +94,7 @@ function MarketplaceOptions({ id, input, settings, update }: { id: MarketplaceId
                   {f.kind === "fixed" && f.value === 0 && <span className="text-warn"> · valor não informado</span>}
                 </span>
               </span>
-              <Switch size="sm" checked={isOn(f.id, f.enabled)} onCheckedChange={(v) => toggle(f.id, v)} />
+              <Switch size="sm" aria-label={`${config.name}: ${f.label}`} checked={isOn(f.id, f.enabled)} onCheckedChange={(v) => toggle(f.id, v)} />
             </label>
           ))}
         </div>
@@ -177,6 +177,7 @@ export function AnalysisForm({ input, update, settings }: { input: AnalysisInput
             Preço por marketplace
             <Switch
               size="sm"
+              aria-label="Preço por marketplace"
               checked={perMarketPrice}
               onCheckedChange={(v) => {
                 setPerMarketPrice(v)
@@ -220,7 +221,7 @@ export function AnalysisForm({ input, update, settings }: { input: AnalysisInput
               Imposto sobre a venda
               <Hint>Tributos dependem do regime tributário e da operação da empresa. Configure de acordo com sua situação.</Hint>
             </span>
-            <Switch checked={input.tax.enabled} onCheckedChange={(v) => update((d) => void (d.tax.enabled = v))} />
+            <Switch aria-label="Imposto sobre a venda" checked={input.tax.enabled} onCheckedChange={(v) => update((d) => void (d.tax.enabled = v))} />
           </div>
           {input.tax.enabled && (
             <Field label="Alíquota sobre o preço de venda" hint="Tributos dependem do regime tributário e da operação da empresa. Configure de acordo com sua situação.">
@@ -234,11 +235,12 @@ export function AnalysisForm({ input, update, settings }: { input: AnalysisInput
               <MegaphoneIcon className="size-3.5 text-muted-foreground" />
               Custo de publicidade
             </span>
-            <Switch checked={input.ads.enabled} onCheckedChange={(v) => update((d) => void (d.ads.enabled = v))} />
+            <Switch aria-label="Custo de publicidade" checked={input.ads.enabled} onCheckedChange={(v) => update((d) => void (d.ads.enabled = v))} />
           </div>
           {input.ads.enabled && (
             <div className="flex flex-col gap-2 sm:flex-row">
               <Segmented
+                aria-label="Forma de cobrança da publicidade"
                 size="sm"
                 className="sm:w-60"
                 value={input.ads.mode}

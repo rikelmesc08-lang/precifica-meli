@@ -68,6 +68,9 @@ export function AnalysisPage() {
   const [saveOpen, setSaveOpen] = React.useState(false)
   const [saveMarketplace, setSaveMarketplace] = React.useState<MarketplaceId>("mercadolivre")
   const loadedFor = React.useRef<string | null | undefined>(undefined)
+  // Muda a cada carga/limpeza para remontar o formulário e reiniciar seu estado local
+  // (ex.: o interruptor "Preço por marketplace" ficava ligado após clicar em "Nova").
+  const [formKey, setFormKey] = React.useState(0)
 
   // Carrega: produto (?id=), rascunho ou análise em branco.
   React.useEffect(() => {
@@ -83,6 +86,7 @@ export function AnalysisPage() {
       setInput(storage.loadDraft() ?? createEmptyAnalysis(settings))
       setEditingId(null)
     }
+    setFormKey((k) => k + 1)
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [hydrated, productId, products, settings])
 
@@ -146,6 +150,7 @@ export function AnalysisPage() {
     storage.saveDraft(null)
     setInput(createEmptyAnalysis(settings))
     setEditingId(null)
+    setFormKey((k) => k + 1)
     loadedFor.current = null
     router.replace("/analise")
   }
@@ -172,7 +177,7 @@ export function AnalysisPage() {
 
       <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <div className="xl:sticky xl:top-6 xl:max-h-[calc(100dvh-3rem)] xl:self-start xl:overflow-y-auto xl:pb-2 [scrollbar-width:thin]">
-          <AnalysisForm input={input} update={update} settings={settings} />
+          <AnalysisForm key={formKey} input={input} update={update} settings={settings} />
         </div>
 
         <div className="min-w-0 space-y-6">
