@@ -7,7 +7,7 @@ import { CopyIcon, MoreHorizontalIcon, PackageIcon, PencilIcon, RefreshCwIcon, S
 import { toast } from "sonner"
 import type { ProductStatus, SavedProduct } from "@/types"
 import { classify } from "@/lib/calc"
-import { buildSnapshot, createProduct, recalculateProduct } from "@/lib/products"
+import { createProduct, isSnapshotStale, recalculateProduct } from "@/lib/products"
 import { formatDate } from "@/lib/format"
 import { useStore } from "@/components/providers/store-provider"
 import { EmptyState, MarketplaceName, Money, PageHeader, Pct, Segmented, StatusBadge } from "@/components/app/bits"
@@ -30,10 +30,7 @@ export default function ProductsPage() {
   if (!hydrated) return <div className="h-96 animate-pulse rounded-xl bg-muted/30" />
 
   const rows = products
-    .map((p) => {
-      const current = buildSnapshot(p.input, p.marketplace, settings)
-      return { p, status: classify(p.snapshot.profit, p.snapshot.margin, settings.targets), stale: current.profit !== p.snapshot.profit || current.salePrice !== p.snapshot.salePrice }
-    })
+    .map((p) => ({ p, status: classify(p.snapshot.profit, p.snapshot.margin, settings.targets), stale: isSnapshotStale(p, settings) }))
     .filter(({ p, status }) => {
       const q = query.trim().toLowerCase()
       const matches = !q || [p.input.name, p.input.category, p.input.supplier].some((v) => v?.toLowerCase().includes(q))
@@ -41,7 +38,8 @@ export default function ProductsPage() {
     })
     .sort((a, b) => b.p.updatedAt.localeCompare(a.p.updatedAt))
 
-  const staleCount = products.filter((p) => buildSnapshot(p.input, p.marketplace, settings).profit !== p.snapshot.profit).length
+  // Mesmo critério das linhas da tabela (antes o contador só comparava o lucro).
+  const staleCount = products.filter((p) => isSnapshotStale(p, settings)).length
 
   const duplicate = (p: SavedProduct) => {
     const copy = createProduct({ ...p.input, name: `${p.input.name} (cópia)` }, p.marketplace, settings)

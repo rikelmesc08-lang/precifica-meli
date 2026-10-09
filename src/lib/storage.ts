@@ -20,6 +20,14 @@ function read<T>(key: string): T | null {
   }
 }
 
+function remove(key: string) {
+  try {
+    window.localStorage.removeItem(key)
+  } catch {
+    // Armazenamento bloqueado (ex.: navegação privada restrita): ignora.
+  }
+}
+
 function write(key: string, value: unknown) {
   try {
     window.localStorage.setItem(key, JSON.stringify(value))
@@ -55,7 +63,7 @@ export const storage = {
   },
   saveProducts: (p: SavedProduct[]) => write(KEYS.products, p),
   loadDraft: (): AnalysisInput | null => read<AnalysisInput>(KEYS.draft),
-  saveDraft: (d: AnalysisInput | null) => (d ? write(KEYS.draft, d) : window.localStorage.removeItem(KEYS.draft)),
+  saveDraft: (d: AnalysisInput | null) => (d ? write(KEYS.draft, d) : remove(KEYS.draft)),
 }
 
 export function newId(): string {
