@@ -13,7 +13,21 @@ import type { FeeRule, MarketplaceConfig, MarketplaceId } from "@/types"
  * verificados automaticamente e podem mudar a qualquer momento ou variar por
  * conta, reputação, categoria e programa. `lastUpdatedAt` começa como null
  * e só é preenchido quando o usuário confirma as taxas em Configurações.
+ *
+ * CONFERÊNCIA DE 09/10/2026 (páginas oficiais, sem login):
+ *  - TikTok Shop: comissão 10%/6% e tarifa por item R$ 4/R$ 6 (corte em R$ 50,
+ *    vigência 15/07/2026) CONFIRMADAS na página oficial "Tarifa de Comissão da
+ *    Plataforma" (seller-br.tiktok.com, knowledge_id=24428156307201). Programa de
+ *    Frete Grátis (6%) NÃO confirmado: o artigo oficial não trata dele.
+ *  - Shopee: NÃO confirmado — a página oficial (seller.shopee.com.br/edu) carrega o
+ *    conteúdo só via JavaScript e não pôde ser lida. A faixa de R$ 28 (≥ R$ 500) não
+ *    apareceu em nenhuma fonte encontrada; confira no painel do vendedor.
+ *  - Mercado Livre: NÃO confirmado — mercadolivre.com.br/ajuda e /landing/custos-de-venda
+ *    responderam HTTP 403 ao acesso automatizado.
+ * Nenhum valor numérico foi alterado nessa conferência.
  */
+
+const OFFICIAL_CHECKED_AT = "2026-10-09"
 
 const CONSULTED_AT = "2026-09-25"
 
@@ -105,7 +119,15 @@ const shopee: MarketplaceConfig = {
     rule({ id: "sp-fixed-b", label: "Tarifa fixa por item", group: "fixed", kind: "fixed", value: 16, minPrice: 80, maxPrice: 100 }),
     rule({ id: "sp-fixed-c", label: "Tarifa fixa por item", group: "fixed", kind: "fixed", value: 20, minPrice: 100, maxPrice: 200 }),
     rule({ id: "sp-fixed-d", label: "Tarifa fixa por item", group: "fixed", kind: "fixed", value: 26, minPrice: 200, maxPrice: 500 }),
-    rule({ id: "sp-fixed-e", label: "Tarifa fixa por item", group: "fixed", kind: "fixed", value: 28, minPrice: 500 }),
+    rule({
+      id: "sp-fixed-e",
+      label: "Tarifa fixa por item",
+      group: "fixed",
+      kind: "fixed",
+      value: 28,
+      minPrice: 500,
+      note: "Valor não confirmado em fonte oficial (conferência de 09/10/2026). Confira no painel do vendedor.",
+    }),
     rule({
       id: "sp-service",
       label: "Taxa de serviço",
@@ -169,7 +191,7 @@ const tiktok: MarketplaceConfig = {
       kind: "percent",
       value: 6,
       enabled: false,
-      note: "Somente para sellers participantes do programa.",
+      note: "Somente para sellers participantes do programa. Percentual não confirmado em página oficial (conferência de 09/10/2026); fontes secundárias citam teto por item.",
     }),
     rule({
       id: "tt-affiliate",
@@ -188,9 +210,10 @@ const tiktok: MarketplaceConfig = {
       consultedAt: CONSULTED_AT,
     },
     {
-      label: "TikTok Shop — Tarifa de Comissão da Plataforma (página oficial, para conferência)",
+      // Lida em 09/10/2026: comissão 10% (< R$ 50) / 6% (≥ R$ 50); taxa por item R$ 4,00 / R$ 6,00; vigência 15/07/2026.
+      label: "TikTok Shop — Tarifa de Comissão da Plataforma (página oficial)",
       url: "https://seller-br.tiktok.com/university/essay?knowledge_id=24428156307201&lang=pt-BR",
-      consultedAt: null,
+      consultedAt: OFFICIAL_CHECKED_AT,
     },
   ],
   lastUpdatedAt: null,
