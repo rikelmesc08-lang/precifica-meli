@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://precifica-meli.vercel.app/sitemap.xml
