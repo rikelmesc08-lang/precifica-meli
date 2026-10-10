@@ -20,12 +20,10 @@ on:
         description: "Limite de turnos do Claude"
         required: false
         default: "80"
-  # Teste antes do merge: roda uma vez quando a branch de instalação é enviada. Não casa com as branches dos agentes.
-  push:
-    branches: ["agentes/instalacao"]
-  # Agenda: DESLIGADA até o operador confirmar.
-  # schedule:
-  #   - cron: "7 7 * * 1,3,5"
+  # Agenda autorizada pelo operador em 2026-10-10. O cron do GitHub é em UTC (Bahia = UTC-3) e só vale na branch
+  # principal; pode atrasar alguns minutos. Para desligar: comentar as 2 linhas abaixo ou Actions > Disable workflow.
+  schedule:
+    - cron: "7 7 * * 1,3,5"
 
 concurrency:
   group: agentes-projeto
