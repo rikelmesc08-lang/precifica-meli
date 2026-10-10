@@ -65,7 +65,8 @@ jobs:
           T: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           [ -n "$T" ] || { echo "::error::Segredo CLAUDE_CODE_OAUTH_TOKEN ausente neste repositório."; exit 1; }
-          echo "Segredo presente."
+          # impressão digital (12 primeiros hex do SHA-256): compara com outros repositórios sem revelar o token
+          python3 -c "import hashlib,os; t=os.environ['T']; print('Segredo presente:', len(t), 'caracteres, impressao digital', hashlib.sha256(t.encode()).hexdigest()[:12], '| espacos nas pontas:', t != t.strip())"
 
       - name: Trabalho anterior dos agentes e PR aberto
         env:
@@ -169,7 +170,7 @@ jobs:
           python3 -c "import json,sys; r=[json.loads(l) for l in open(sys.argv[1]) if l.startswith('{\"type\":\"result\"')]; d=r[-1] if r else {}; print({k: d.get(k) for k in ('subtype','is_error','num_turns')}); sys.exit(1 if not d or d.get('is_error') else 0)" "$RUNNER_TEMP/logs/claude.jsonl"
 
       - name: Travas de segurança
-        if: env.SKIP != '1'
+        if: env.SKIP != '1' && steps.agente.outcome == 'success'
         run: |
           [ -f AGENT_REPORT.md ] && mv AGENT_REPORT.md "$RUNNER_TEMP/logs/AGENT_REPORT.md"
           git diff --name-only --diff-filter=D > "$RUNNER_TEMP/apagados.txt"
@@ -181,15 +182,12 @@ jobs:
           fi
 
       - name: Branch e Pull Request em rascunho (ou issue com o relatório)
-        if: env.SKIP != '1'
+        if: env.SKIP != '1' && steps.agente.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           BODY="$RUNNER_TEMP/logs/AGENT_REPORT.md"
           [ -f "$BODY" ] || echo "O agente não gerou relatório; veja o artefato da execução ${{ github.run_id }}." > "$BODY"
-          if [ "${{ steps.agente.outcome }}" != "success" ]; then
-            { echo; echo "> Atenção: o passo do agente terminou com erro (${{ steps.agente.outcome }}); veja o artefato."; } >> "$BODY"
-          fi
           printf '\n\n---\nGerado pelo workflow Agentes do projeto (execução ${{ github.run_id }}). Revise antes de qualquer merge.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' >> "$BODY"
           gh label create agentes -R "$GITHUB_REPOSITORY" --color 5319E7 --description "Trabalho dos agentes na nuvem" 2>/dev/null || true
           if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
@@ -218,3 +216,13 @@ jobs:
           path: ${{ runner.temp }}/logs/
           retention-days: 7
           if-no-files-found: ignore
+
+      # Falha do agente (ex.: 401) não vira PR nem issue: o job fica vermelho para aparecer como erro.
+      - name: Resultado do agente
+        if: always() && env.SKIP != '1'
+        run: |
+          if [ "${{ steps.agente.outcome }}" != "success" ]; then
+            echo "::error::O agente falhou (${{ steps.agente.outcome }}). Veja o passo 'Agente desenvolvedor' e o artefato."
+            exit 1
+          fi
+          echo "Agente concluído."
