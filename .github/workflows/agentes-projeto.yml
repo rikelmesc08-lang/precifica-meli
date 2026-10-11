@@ -51,9 +51,10 @@ env:
        TikTok Shop Brasil). Só altere um valor com fonte oficial (URL e data de consulta). Se a página exigir login,
        JS ou der 403 (já ocorreu com ML e Shopee), registre isso em UMA linha no relatório e siga em frente, sem
        insistir nem repetir a análise das execuções anteriores.
-    3. Prioridade da execução: corrija bugs e melhore SEO e acessibilidade da página (metadados, rótulos de
-       formulário, contraste, navegação por teclado), sem mudar o motor de cálculo sem teste. Entregue ao menos uma
-       melhoria concreta em código por execução, se houver alguma segura.
+    3. Prioridade da execução: corrija bugs e melhore SEO, acessibilidade (metadados, rótulos de formulário,
+       contraste, navegação por teclado) e desempenho (peso do bundle, imagens, renderização), sem mudar o motor
+       de cálculo sem teste. Entregue ao menos uma melhoria concreta em código por execução, se houver alguma
+       segura. Não repita o que os relatórios anteriores (issues com o rótulo "agentes") já registraram.
     4. Garanta que `npm test`, `npm run lint` e `npm run build` passam; acrescente testes para o que mudar.
 
 jobs:
