@@ -47,11 +47,15 @@ env:
   OBJETIVO_PADRAO: |
     Auditoria e entrega de melhorias na calculadora Precifica Meli (Next.js, Vitest).
     1. Leia README.md, AGENTS.md e CLAUDE.md do repositório e siga as regras de lá.
-    2. Confira as tarifas em `src/config/marketplaces.ts` contra as páginas oficiais atuais do Mercado Livre, Shopee e
-       TikTok Shop Brasil. Só altere um valor com fonte oficial (URL e data de consulta no comentário ou no relatório);
-       o que não conseguir confirmar fica como "não confirmado" no relatório, sem mudar o número.
-    3. Garanta que `npm test`, `npm run lint` e `npm run build` passam; acrescente testes para o que mudar.
-    4. Corrija bugs encontrados e melhore SEO e acessibilidade da página sem mudar o motor de cálculo sem teste.
+    2. Tarifas em `src/config/marketplaces.ts`: tente no máximo 1 consulta por marketplace (Mercado Livre, Shopee,
+       TikTok Shop Brasil). Só altere um valor com fonte oficial (URL e data de consulta). Se a página exigir login,
+       JS ou der 403 (já ocorreu com ML e Shopee), registre isso em UMA linha no relatório e siga em frente, sem
+       insistir nem repetir a análise das execuções anteriores.
+    3. Prioridade da execução: corrija bugs e melhore SEO, acessibilidade (metadados, rótulos de formulário,
+       contraste, navegação por teclado) e desempenho (peso do bundle, imagens, renderização), sem mudar o motor
+       de cálculo sem teste. Entregue ao menos uma melhoria concreta em código por execução, se houver alguma
+       segura. Não repita o que os relatórios anteriores (issues com o rótulo "agentes") já registraram.
+    4. Garanta que `npm test`, `npm run lint` e `npm run build` passam; acrescente testes para o que mudar.
 
 jobs:
   agente:
